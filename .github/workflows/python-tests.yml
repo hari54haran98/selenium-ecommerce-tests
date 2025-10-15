@@ -61,39 +61,73 @@ jobs:
         
         driver.quit()
         print('🎉 ALL CI/CD TESTS PASSED! 🎉')
-        - name: Test checkout functionality
-          run: |
-            python -c "
-            from utilities.helper import Helper
-            from pages.login_page import LoginPage
-            from pages.products_page import ProductsPage
-            from pages.cart_page import CartPage
-            from pages.checkout_page import CheckoutPage
+        "
 
-            print('🧪 Testing complete checkout flow in CI/CD...')
-            driver = Helper.setup_driver(headless=True)
+    - name: Test cart functionality
+      run: |
+        python -c "
+        from utilities.helper import Helper
+        from pages.login_page import LoginPage
+        from pages.products_page import ProductsPage
+        from pages.cart_page import CartPage
+        
+        print('🧪 Testing cart functionality in CI/CD...')
+        driver = Helper.setup_driver(headless=True)
+        
+        # Complete flow: Login → Add items → Cart
+        login_page = LoginPage(driver)
+        products_page = ProductsPage(driver)
+        cart_page = CartPage(driver)
+        
+        login_page.navigate_to_login().login('standard_user', 'secret_sauce')
+        products_page.add_backpack_to_cart().add_bike_light_to_cart()
+        products_page.go_to_cart()
+        
+        # Verify cart functionality
+        item_count = cart_page.get_cart_items_count()
+        item_names = cart_page.get_cart_item_names()
+        
+        assert item_count == 2, f'Expected 2 items, got {item_count}'
+        assert 'Sauce Labs Backpack' in item_names, 'Backpack not in cart'
+        assert 'Sauce Labs Bike Light' in item_names, 'Bike light not in cart'
+        
+        print('✅ Cart functionality verified!')
+        driver.quit()
+        "
 
-            # Initialize all pages
-            login_page = LoginPage(driver)
-            products_page = ProductsPage(driver)
-            cart_page = CartPage(driver)
-            checkout_page = CheckoutPage(driver)
-
-            # Complete e-commerce flow
-            login_page.navigate_to_login().login('standard_user', 'secret_sauce')
-            products_page.add_backpack_to_cart()
-            products_page.go_to_cart()
-            cart_page.proceed_to_checkout()
-
-            # Checkout process
-            checkout_page.enter_shipping_info('CI', 'CD', '12345')
-            checkout_page.continue_to_overview()
-            checkout_page.complete_purchase()
-
-            # Verify success
-            success_message = checkout_page.get_success_message()
-            assert 'thank you for your order' in success_message.lower(), f'Unexpected success message: {success_message}'
-
-            print('✅ Complete checkout flow verified!')
-            driver.quit()
-            "
+    - name: Test checkout functionality
+      run: |
+        python -c "
+        from utilities.helper import Helper
+        from pages.login_page import LoginPage
+        from pages.products_page import ProductsPage
+        from pages.cart_page import CartPage
+        from pages.checkout_page import CheckoutPage
+        
+        print('🧪 Testing complete checkout flow in CI/CD...')
+        driver = Helper.setup_driver(headless=True)
+        
+        # Initialize all pages
+        login_page = LoginPage(driver)
+        products_page = ProductsPage(driver)
+        cart_page = CartPage(driver)
+        checkout_page = CheckoutPage(driver)
+        
+        # Complete e-commerce flow
+        login_page.navigate_to_login().login('standard_user', 'secret_sauce')
+        products_page.add_backpack_to_cart()
+        products_page.go_to_cart()
+        cart_page.proceed_to_checkout()
+        
+        # Checkout process
+        checkout_page.enter_shipping_info('CI', 'CD', '12345')
+        checkout_page.continue_to_overview()
+        checkout_page.complete_purchase()
+        
+        # Verify success
+        success_message = checkout_page.get_success_message()
+        assert 'thank you for your order' in success_message.lower(), f'Unexpected success message: {success_message}'
+        
+        print('✅ Complete checkout flow verified!')
+        driver.quit()
+        "
