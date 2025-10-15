@@ -24,25 +24,36 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install Firefox with GeckoDriver
+    - name: Install Firefox (simple approach)
       run: |
         sudo apt-get update
         sudo apt-get install -y firefox
-        
-        # Install specific Firefox version that works with Selenium
-        wget -O firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US"
-        sudo tar -xjf firefox.tar.bz2 -C /opt/
-        sudo ln -sf /opt/firefox/firefox /usr/local/bin/firefox
 
-    - name: Run Selenium tests
+    - name: Run simple Selenium test
       run: |
         python -c "
+        import os
+        print('🏗️ CI/CD Environment:', os.getenv('GITHUB_ACTIONS'))
+        
+        # Test basic imports first
         from utilities.helper import Helper
         from pages.login_page import LoginPage
-        print('🧪 Starting CI/CD test with environment detection...')
+        
+        print('🧪 Starting simple CI/CD test...')
+        
+        # Use headless mode for CI/CD
         driver = Helper.setup_driver(headless=True)
+        print('✅ Browser setup successful!')
+        
+        # Simple test - just navigate and check title
+        driver.get('https://www.saucedemo.com')
+        print('✅ Page loaded. Title:', driver.title)
+        
+        # Basic login test
         login_page = LoginPage(driver)
-        login_page.navigate_to_login().login('standard_user', 'secret_sauce')
-        print('✅ Login test passed!')
+        login_page.login('standard_user', 'secret_sauce')
+        print('✅ Login completed!')
+        
         driver.quit()
+        print('🎉 CI/CD test passed!')
         "
