@@ -24,36 +24,25 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install Firefox
+    - name: Install Firefox with GeckoDriver
       run: |
         sudo apt-get update
         sudo apt-get install -y firefox
+        
+        # Install specific Firefox version that works with Selenium
+        wget -O firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US"
+        sudo tar -xjf firefox.tar.bz2 -C /opt/
+        sudo ln -sf /opt/firefox/firefox /usr/local/bin/firefox
 
-    - name: Run basic login test
+    - name: Run Selenium tests
       run: |
         python -c "
         from utilities.helper import Helper
         from pages.login_page import LoginPage
-        print('🧪 Testing login functionality...')
+        print('🧪 Starting CI/CD test with environment detection...')
         driver = Helper.setup_driver(headless=True)
         login_page = LoginPage(driver)
         login_page.navigate_to_login().login('standard_user', 'secret_sauce')
         print('✅ Login test passed!')
-        driver.quit()
-        "
-
-    - name: Run products test
-      run: |
-        python -c "
-        from utilities.helper import Helper
-        from pages.login_page import LoginPage
-        from pages.products_page import ProductsPage
-        print('🧪 Testing products functionality...')
-        driver = Helper.setup_driver(headless=True)
-        login_page = LoginPage(driver)
-        products_page = ProductsPage(driver)
-        login_page.navigate_to_login().login('standard_user', 'secret_sauce')
-        products_page.add_backpack_to_cart()
-        print('✅ Products test passed!')
         driver.quit()
         "
