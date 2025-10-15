@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.firefox import GeckoDriverManager
 import time
 import os
 
@@ -9,12 +10,12 @@ import os
 class CIHelper:
     @staticmethod
     def setup_driver(headless=False):
-        """Ultra-simple Firefox setup for CI/CD"""
-        print("🏗️ CI/CD: Setting up Firefox (simple method)...")
+        """Use webdriver-manager for automatic Firefox setup in CI/CD"""
+        print("🏗️ CI/CD: Setting up Firefox with webdriver-manager...")
 
         firefox_options = Options()
 
-        # Minimal options for stability
+        # Essential options for CI/CD
         firefox_options.add_argument("--no-sandbox")
         firefox_options.add_argument("--disable-dev-shm-usage")
         firefox_options.add_argument("--window-size=1920,1080")
@@ -23,14 +24,14 @@ class CIHelper:
             firefox_options.add_argument("--headless")
 
         try:
-            # Simple service - let Selenium handle everything
-            service = Service()
+            # Let webdriver-manager handle everything automatically
+            service = Service(GeckoDriverManager().install())
             driver = webdriver.Firefox(service=service, options=firefox_options)
             driver.implicitly_wait(10)
-            print("✅ CI/CD Firefox setup successful!")
+            print("✅ CI/CD Firefox setup successful with webdriver-manager!")
             return driver
         except Exception as e:
-            print(f"❌ CI/CD Firefox failed: {e}")
+            print(f"❌ CI/CD webdriver-manager failed: {e}")
             raise Exception(f"CI/CD Firefox setup failed: {e}")
 
     @staticmethod

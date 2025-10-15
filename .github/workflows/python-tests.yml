@@ -24,36 +24,41 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install Firefox (simple approach)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y firefox
-
-    - name: Run simple Selenium test
+    - name: Run Selenium test with webdriver-manager
       run: |
         python -c "
         import os
-        print('🏗️ CI/CD Environment:', os.getenv('GITHUB_ACTIONS'))
+        print('🏗️ CI/CD Environment detected:', os.getenv('GITHUB_ACTIONS'))
         
-        # Test basic imports first
+        # Import our framework
         from utilities.helper import Helper
         from pages.login_page import LoginPage
+        from pages.products_page import ProductsPage
         
-        print('🧪 Starting simple CI/CD test...')
+        print('🧪 Starting CI/CD test with webdriver-manager...')
         
-        # Use headless mode for CI/CD
+        # Let webdriver-manager handle Firefox setup
         driver = Helper.setup_driver(headless=True)
         print('✅ Browser setup successful!')
         
-        # Simple test - just navigate and check title
+        # Test 1: Basic navigation
         driver.get('https://www.saucedemo.com')
         print('✅ Page loaded. Title:', driver.title)
         
-        # Basic login test
+        # Test 2: Login functionality
         login_page = LoginPage(driver)
         login_page.login('standard_user', 'secret_sauce')
         print('✅ Login completed!')
         
+        # Test 3: Products functionality
+        products_page = ProductsPage(driver)
+        products_page.add_backpack_to_cart()
+        print('✅ Product added to cart!')
+        
+        # Test 4: Screenshot
+        Helper.take_screenshot(driver, 'ci_cd_success')
+        print('✅ Screenshot taken!')
+        
         driver.quit()
-        print('🎉 CI/CD test passed!')
+        print('🎉 ALL CI/CD TESTS PASSED! 🎉')
         "
