@@ -24,35 +24,36 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install Firefox and GeckoDriver
+    - name: Install Firefox
       run: |
         sudo apt-get update
         sudo apt-get install -y firefox
-        # Install GeckoDriver manually
-        wget https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz
-        tar -xzf geckodriver-v0.34.0-linux64.tar.gz
-        sudo mv geckodriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/geckodriver
 
     - name: Run basic Selenium test
       run: |
         python -c "
         from utilities.helper import Helper
         from pages.login_page import LoginPage
+        print('🧪 Starting CI/CD test...')
         driver = Helper.setup_driver(headless=True)
         login_page = LoginPage(driver)
         login_page.navigate_to_login().login('standard_user', 'secret_sauce')
-        print('✅ CI/CD Test Passed!')
+        print('✅ Login test passed!')
         driver.quit()
         "
 
-    - name: Test screenshot capability
+    - name: Test products functionality
       run: |
         python -c "
         from utilities.helper import Helper
+        from pages.login_page import LoginPage
+        from pages.products_page import ProductsPage
+        print('🧪 Testing products page...')
         driver = Helper.setup_driver(headless=True)
-        driver.get('https://www.saucedemo.com')
-        Helper.take_screenshot(driver, 'ci_cd_test')
-        print('📸 Screenshot test passed!')
+        login_page = LoginPage(driver)
+        products_page = ProductsPage(driver)
+        login_page.navigate_to_login().login('standard_user', 'secret_sauce')
+        products_page.add_backpack_to_cart()
+        print('✅ Products test passed!')
         driver.quit()
         "

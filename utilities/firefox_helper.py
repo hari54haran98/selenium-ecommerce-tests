@@ -10,7 +10,7 @@ import os
 class FirefoxHelper:
     @staticmethod
     def setup_driver(headless=False):
-        """Set up and return Firefox WebDriver - Compatible with Linux CI/CD"""
+        """Set up and return Firefox WebDriver - Simplified for CI/CD"""
         print("🦊 Setting up Firefox driver...")
 
         firefox_options = Options()
@@ -18,14 +18,14 @@ class FirefoxHelper:
         # Essential options for CI/CD compatibility
         firefox_options.add_argument("--no-sandbox")
         firefox_options.add_argument("--disable-dev-shm-usage")
-        firefox_options.add_argument("--width=1920")
-        firefox_options.add_argument("--height=1080")
+        firefox_options.add_argument("--disable-gpu")
+        firefox_options.add_argument("--window-size=1920,1080")
 
         if headless:
             firefox_options.add_argument("--headless")
 
         try:
-            # Use webdriver-manager to handle GeckoDriver automatically
+            # Use ONLY webdriver-manager - most reliable approach
             service = Service(GeckoDriverManager().install())
             driver = webdriver.Firefox(service=service, options=firefox_options)
             driver.implicitly_wait(10)
@@ -33,11 +33,7 @@ class FirefoxHelper:
             return driver
         except Exception as e:
             print(f"❌ Firefox setup failed: {e}")
-            print("🔄 Trying alternative setup...")
-            # Fallback: Use system GeckoDriver
-            service = Service('/usr/local/bin/geckodriver')
-            driver = webdriver.Firefox(service=service, options=firefox_options)
-            return driver
+            raise Exception(f"Firefox driver setup failed: {e}")
 
     @staticmethod
     def take_screenshot(driver, name):
