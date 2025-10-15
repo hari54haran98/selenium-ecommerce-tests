@@ -29,31 +29,30 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y firefox
 
-    - name: Run basic Selenium test
-      run: |
-        python -c "
-        from utilities.helper import Helper
-        from pages.login_page import LoginPage
-        print('🧪 Starting CI/CD test...')
-        driver = Helper.setup_driver(headless=True)
-        login_page = LoginPage(driver)
-        login_page.navigate_to_login().login('standard_user', 'secret_sauce')
-        print('✅ Login test passed!')
-        driver.quit()
-        "
-
-    - name: Test products functionality
+    - name: Run Selenium tests
       run: |
         python -c "
         from utilities.helper import Helper
         from pages.login_page import LoginPage
         from pages.products_page import ProductsPage
-        print('🧪 Testing products page...')
+        
+        print('🧪 Starting comprehensive CI/CD test...')
+        
+        # Test 1: Login functionality
         driver = Helper.setup_driver(headless=True)
         login_page = LoginPage(driver)
-        products_page = ProductsPage(driver)
         login_page.navigate_to_login().login('standard_user', 'secret_sauce')
+        print('✅ Login test passed!')
+        
+        # Test 2: Products functionality
+        products_page = ProductsPage(driver)
         products_page.add_backpack_to_cart()
         print('✅ Products test passed!')
+        
+        # Test 3: Screenshot capability
+        Helper.take_screenshot(driver, 'ci_cd_comprehensive')
+        print('✅ Screenshot test passed!')
+        
         driver.quit()
+        print('🎉 All CI/CD tests passed!')
         "

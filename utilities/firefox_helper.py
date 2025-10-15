@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.firefox import GeckoDriverManager
 import time
 import os
 
@@ -10,30 +9,35 @@ import os
 class FirefoxHelper:
     @staticmethod
     def setup_driver(headless=False):
-        """Set up and return Firefox WebDriver - Simplified for CI/CD"""
+        """Set up Firefox WebDriver - Optimized for CI/CD"""
         print("🦊 Setting up Firefox driver...")
 
         firefox_options = Options()
 
-        # Essential options for CI/CD compatibility
+        # Critical options for CI/CD stability
         firefox_options.add_argument("--no-sandbox")
         firefox_options.add_argument("--disable-dev-shm-usage")
         firefox_options.add_argument("--disable-gpu")
         firefox_options.add_argument("--window-size=1920,1080")
 
+        # Firefox-specific optimizations
+        firefox_options.set_preference("dom.ipc.processCount", 8)
+        firefox_options.set_preference("dom.disable_beforeunload", True)
+        firefox_options.set_preference("dom.popup_maximum", 0)
+
         if headless:
             firefox_options.add_argument("--headless")
 
         try:
-            # Use ONLY webdriver-manager - most reliable approach
-            service = Service(GeckoDriverManager().install())
+            # Use system Firefox with direct service (no webdriver-manager)
+            service = Service()
             driver = webdriver.Firefox(service=service, options=firefox_options)
             driver.implicitly_wait(10)
             print("✅ Firefox driver setup successful!")
             return driver
         except Exception as e:
             print(f"❌ Firefox setup failed: {e}")
-            raise Exception(f"Firefox driver setup failed: {e}")
+            raise
 
     @staticmethod
     def take_screenshot(driver, name):
