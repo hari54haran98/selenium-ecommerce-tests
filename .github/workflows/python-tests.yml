@@ -24,10 +24,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install Firefox for Selenium
+    - name: Install Firefox and GeckoDriver
       run: |
         sudo apt-get update
-        sudo apt-get install -y firefox firefox-geckodriver
+        sudo apt-get install -y firefox
+        # Install GeckoDriver manually
+        wget https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz
+        tar -xzf geckodriver-v0.34.0-linux64.tar.gz
+        sudo mv geckodriver /usr/local/bin/
+        sudo chmod +x /usr/local/bin/geckodriver
 
     - name: Run basic Selenium test
       run: |
