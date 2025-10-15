@@ -9,29 +9,29 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
+
     - name: Install Firefox for Selenium
       run: |
         sudo apt-get update
-        sudo apt-get install -y firefox
-        
+        sudo apt-get install -y firefox firefox-geckodriver
+
     - name: Run basic Selenium test
       run: |
-        python -c \"
+        python -c "
         from utilities.helper import Helper
         from pages.login_page import LoginPage
         driver = Helper.setup_driver(headless=True)
@@ -39,4 +39,15 @@ jobs:
         login_page.navigate_to_login().login('standard_user', 'secret_sauce')
         print('✅ CI/CD Test Passed!')
         driver.quit()
-        \"
+        "
+
+    - name: Test screenshot capability
+      run: |
+        python -c "
+        from utilities.helper import Helper
+        driver = Helper.setup_driver(headless=True)
+        driver.get('https://www.saucedemo.com')
+        Helper.take_screenshot(driver, 'ci_cd_test')
+        print('📸 Screenshot test passed!')
+        driver.quit()
+        "
